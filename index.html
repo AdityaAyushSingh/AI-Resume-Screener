@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResumeAI Screen — Next-Gen Candidate Intelligence</title>
+  <meta name="description" content="AI-powered resume screening system that ranks candidates against a job description with match scores, strengths, gaps, and fit recommendations." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <div class="scanlines"></div>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <header id="app-header">
+    <div class="header-content">
+      <div class="header-top-row">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h1>ResumeAI<span class="accent">Screen</span></h1>
+        </div>
+        <button id="theme-toggle-btn" class="btn btn-icon-only theme-toggle" type="button" title="Toggle theme">
+          <svg id="theme-icon-moon" class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="theme-icon-sun" class="theme-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+      <p class="tagline">Next-Generation Candidate Intelligence Platform</p>
+    </div>
+  </header>
+
+  <main id="app-main">
+    <!-- API Key -->
+    <section class="input-section" id="api-section">
+      <div class="section-header">
+        <div class="step-badge step-badge-key">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        </div>
+        <div>
+          <h2>Gemini API Key</h2>
+          <p class="section-subtitle">Saved locally in your browser for convenience. Never transmitted elsewhere.</p>
+        </div>
+      </div>
+      <div class="glass-card">
+        <div class="api-key-row">
+          <input type="password" id="api-key-input" placeholder="Paste your Gemini API key here…" autocomplete="off" />
+          <button id="toggle-key-btn" class="btn btn-icon-only" type="button" title="Show/hide key">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Job Description -->
+    <section class="input-section" id="jd-section">
+      <div class="section-header">
+        <div class="step-badge">1</div>
+        <div>
+          <h2>Job Description</h2>
+          <p class="section-subtitle">Paste the full JD — skills, qualifications, experience, and responsibilities.</p>
+        </div>
+      </div>
+      <div class="glass-card">
+        <textarea id="jd-input" placeholder="Paste your job description here...&#10;&#10;Example:&#10;We are looking for a Data Analyst with 3+ years of experience in SQL, Python, and Tableau…" rows="8"></textarea>
+      </div>
+    </section>
+
+    <!-- Resumes -->
+    <section class="input-section" id="resume-section">
+      <div class="section-header">
+        <div class="step-badge">2</div>
+        <div>
+          <h2>Candidate Resumes</h2>
+          <p class="section-subtitle">Upload PDFs or paste text. Drag multiple PDFs for batch upload.</p>
+        </div>
+      </div>
+
+      <div class="glass-card" id="resume-form-card">
+        <div class="resume-form">
+          <div class="form-row">
+            <label for="candidate-name">Candidate Name</label>
+            <input type="text" id="candidate-name" placeholder="e.g. Jane Doe" />
+          </div>
+          <div class="form-row">
+            <label>Resume (PDF or text)</label>
+            <div class="upload-zone" id="upload-zone">
+              <input type="file" id="pdf-upload" accept=".pdf" multiple hidden />
+              <div class="upload-zone-content" id="upload-zone-content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+                <p>Drop PDF(s) here or <span class="upload-link">browse</span></p>
+                <span class="upload-hint">Supports batch upload · or paste text below</span>
+              </div>
+            </div>
+            <div class="pdf-file-info hidden" id="pdf-file-info">
+              <span class="pdf-file-name" id="pdf-file-name"></span>
+              <button class="btn btn-danger btn-xs" id="clear-pdf-btn" type="button">✕</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <textarea id="resume-text" placeholder="Or paste resume text here…" rows="5"></textarea>
+          </div>
+          <button id="add-resume-btn" class="btn btn-secondary" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Candidate
+          </button>
+        </div>
+      </div>
+
+      <div id="resume-list" class="resume-list"></div>
+    </section>
+
+    <!-- Analyze -->
+    <div class="analyze-wrapper" id="analyze-wrapper">
+      <button id="analyze-btn" class="btn btn-primary btn-glow" type="button" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Analyze Candidates
+      </button>
+      <p class="analyze-hint" id="analyze-hint">Add your API key, a job description, and at least one resume to begin.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-section hidden" id="progress-section">
+      <div class="glass-card progress-card">
+        <div class="progress-header">
+          <span class="spinner-neon"></span>
+          <span class="progress-title" id="progress-title">Initializing Gemini AI…</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
+        <div class="progress-steps" id="progress-steps"></div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <section class="results-section hidden" id="results-section">
+      <div class="section-header">
+        <div class="step-badge step-badge-result">✓</div>
+        <div>
+          <h2>Screening Results</h2>
+          <p class="section-subtitle">Candidates ranked by match score against the job description.</p>
+        </div>
+      </div>
+
+      <!-- AI Summary -->
+      <div class="glass-card ai-summary-card hidden" id="ai-summary-card">
+        <div class="ai-summary-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg>
+          <h3>AI Insight Summary</h3>
+        </div>
+        <p class="ai-summary-text" id="ai-summary-text"></p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="result-actions">
+        <button class="btn btn-secondary" id="export-csv-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon" width="18" height="18"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+        <button class="btn btn-secondary hidden" id="compare-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon" width="18" height="18"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Compare Top 2
+        </button>
+        <button class="btn btn-secondary hidden" id="interview-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon" width="18" height="18"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Generate Interview Questions
+        </button>
+        <!-- Filter Dropdown -->
+        <div class="filter-dropdown">
+          <label class="filter-label">Filter:</label>
+          <select id="filter-select" class="filter-select">
+            <option value="all">All Candidates</option>
+            <option value="Strong Fit">Strong Fit</option>
+            <option value="Moderate Fit">Moderate Fit</option>
+            <option value="Not Fit">Not Fit</option>
+            <option value="shortlisted">★ Shortlisted</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-cards" id="summary-cards"></div>
+
+      <!-- Results Table -->
+      <div class="glass-card table-card">
+        <div class="table-wrapper">
+          <table id="results-table">
+            <thead>
+              <tr>
+                <th data-sort="rank" class="sortable">Rank ▼</th>
+                <th>Candidate</th>
+                <th data-sort="score" class="sortable">Score</th>
+                <th>Key Strengths</th>
+                <th>Key Gaps</th>
+                <th>Recommendation</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Skill Match Matrix -->
+      <div class="glass-card skill-matrix-card hidden" id="skill-matrix-card">
+        <h3 class="matrix-title">Skill Match Matrix</h3>
+        <p class="matrix-subtitle">Which skills from the JD each candidate matches</p>
+        <div class="matrix-wrapper" id="skill-matrix-wrapper"></div>
+      </div>
+
+      <!-- Comparison -->
+      <div class="comparison-section hidden" id="comparison-section">
+        <div class="section-header">
+          <div class="step-badge step-badge-compare">⚔</div>
+          <div>
+            <h2>Head-to-Head Comparison</h2>
+            <p class="section-subtitle">Side-by-side analysis of the top two candidates.</p>
+          </div>
+        </div>
+        <div class="comparison-grid" id="comparison-grid"></div>
+      </div>
+
+      <!-- Interview Questions -->
+      <div class="glass-card interview-card hidden" id="interview-card">
+        <div class="interview-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <h3>AI-Generated Interview Questions</h3>
+        </div>
+        <div id="interview-content"></div>
+      </div>
+
+      <!-- Radar Chart -->
+      <div class="glass-card radar-card hidden" id="radar-card">
+        <h3 class="radar-title">Skills Radar — All Candidates</h3>
+        <div class="radar-container">
+          <canvas id="radar-canvas" width="440" height="440"></canvas>
+        </div>
+        <div class="radar-legend" id="radar-legend"></div>
+      </div>
+
+      <!-- Candidate Detail Cards -->
+      <div id="candidate-details" class="candidate-details"></div>
+    </section>
+  </main>
+
+  <footer id="app-footer">
+    <p>ResumeAI<span class="accent">Screen</span> — Powered by Google Gemini</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
