@@ -14,12 +14,8 @@
 
   // ─── DOM refs ────────────────────────────────────────────────────
   const $ = id => document.getElementById(id);
-  const canvas = $('particles-canvas');
   const apiKeyInput = $('api-key-input');
   const toggleKeyBtn = $('toggle-key-btn');
-  const themeToggleBtn = $('theme-toggle-btn');
-  const themeIconMoon = $('theme-icon-moon');
-  const themeIconSun = $('theme-icon-sun');
   const jdInput = $('jd-input');
   const candidateName = $('candidate-name');
   const resumeText = $('resume-text');
@@ -59,75 +55,7 @@
 
   let pdfTextContent = '';
 
-  // ═══════════════════════════════════════════════════════════════
-  //  PARTICLE BACKGROUND
-  // ═══════════════════════════════════════════════════════════════
-  (function initParticles() {
-    const ctx = canvas.getContext('2d');
-    let width, height, particles, mouse = { x: null, y: null };
-    const resize = () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; };
-    const create = () => {
-      const count = Math.floor((width * height) / 20000);
-      particles = Array.from({ length: count }, () => ({
-        x: Math.random() * width, y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
-        r: Math.random() * 1.4 + 0.5,
-      }));
-    };
-    const draw = () => {
-      ctx.clearRect(0, 0, width, height);
-      const style = getComputedStyle(document.documentElement);
-      const dotColor = style.getPropertyValue('--particle-dot').trim();
-      const lineColor = style.getPropertyValue('--particle-line').trim();
-      const mouseColor = style.getPropertyValue('--particle-mouse').trim();
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = dotColor; ctx.fill();
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const d = Math.hypot(p.x - p2.x, p.y - p2.y);
-          if (d < 120) {
-            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y);
-            const alpha = (1 - d / 120);
-            ctx.strokeStyle = lineColor.replace(/[\d.]+\)$/, (alpha * 0.12) + ')');
-            ctx.lineWidth = 0.6; ctx.stroke();
-          }
-        }
-        if (mouse.x !== null) {
-          const d = Math.hypot(p.x - mouse.x, p.y - mouse.y);
-          if (d < 160) {
-            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = mouseColor.replace(/[\d.]+\)$/, ((1 - d / 160) * 0.2) + ')');
-            ctx.lineWidth = 0.8; ctx.stroke();
-          }
-        }
-      }
-      requestAnimationFrame(draw);
-    };
-    window.addEventListener('resize', () => { resize(); create(); });
-    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-    window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
-    resize(); create(); draw();
-  })();
 
-  // ═══════════════════════════════════════════════════════════════
-  //  THEME TOGGLE
-  // ═══════════════════════════════════════════════════════════════
-  function setTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('ras-theme', theme);
-    themeIconMoon.classList.toggle('hidden', theme === 'dark');
-    themeIconSun.classList.toggle('hidden', theme === 'light');
-  }
-  themeToggleBtn.addEventListener('click', () => {
-    const cur = document.documentElement.getAttribute('data-theme');
-    setTheme(cur === 'dark' ? 'light' : 'dark');
-  });
-  setTheme(localStorage.getItem('ras-theme') || 'dark');
 
   // ═══════════════════════════════════════════════════════════════
   //  TOAST NOTIFICATIONS
